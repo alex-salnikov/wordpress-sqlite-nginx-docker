@@ -1,4 +1,4 @@
-from nginx:latest
+FROM dockerfile/nginx
 MAINTAINER Dorward Villaruz <dorwardv@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -23,7 +23,7 @@ RUN cp ${DOCUMENT_ROOT}/wp-config-sample.php ${DOCUMENT_ROOT}/wp-config.php
 RUN sed -i -e"s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
 RUN sed -i -e"s/keepalive_timeout 2/keepalive_timeout 2;\n\tclient_max_body_size 10m/" /etc/nginx/nginx.conf
 RUN sed -i -e "s|include /etc/nginx/conf.d/\*.conf|include /etc/nginx/sites-enabled/\*|g" /etc/nginx/nginx.conf
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+#RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
 # php-fpm config
 RUN sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
@@ -36,9 +36,14 @@ RUN chown -R www-data.www-data ${DOCUMENT_ROOT}
 
 COPY default /etc/nginx/sites-available/default
 RUN mkdir -p /etc/nginx/sites-enabled
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+#RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 EXPOSE 80
 EXPOSE 443
 
 CMD service php5-fpm start && nginx
+
+# Example:
+# docker build -t alex-salnikov/wordpress_lite .
+# docker run -d --name=wordpress_lite -p 8080:80 alex-salnikov/wordpress_lite
+# ----
